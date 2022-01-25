@@ -4,7 +4,7 @@
  *      *** Do not modify ! ***
  *
  * Project: 'accelerometer_adxl345' 
- * Target:  'accelerometer adxl345' 
+ * Target:  'accelerometer_adxl345' 
  */
 
 #ifndef RTE_COMPONENTS_H

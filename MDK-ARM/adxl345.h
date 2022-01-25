@@ -35,6 +35,29 @@
 #define POWER_CTL_Measure       0x08
 #define POWER_CTL_AUTO_SLEEP    0x10
 #define POWER_CTL_Link          0x20
+//Назначение выходных линий для прерываний флагов прерываний
+#define INACT_X                 0x01
+#define INACT_Y                 0x02 
+#define INACT_Z                 0x04
+#define INACT_acdc              0x08
+#define ACT_X                   0x10
+#define ACT_Y                   0x20 
+#define ACT_Z                   0x40
+#define ACT_acdc                0x80
+//Регистр флагов прерываний
+#define Overrun                 0x01
+#define Wetermark               0x02
+#define FREE_FALL               0x04
+#define Inactivity              0x08
+#define Activity                0x10
+#define DOUBLE_TAB              0x20
+#define SINGLE_FALL             0x40
+#define DATA_READY              0x80
+//Выбор оси
+#define TAP_X                   0x01
+#define TAP_Y                   0x02 
+#define TAP_Z                   0x04
+#define Suppress                0x08
 
 struct AdxlCommands
 {
@@ -88,8 +111,9 @@ extern uint8_t i2c_tx[2];
 int adxl345_init(void);
 void SendCommand(uint8_t, uint8_t);
 void Read_Data(void);
-
-
+void ActivWichInterruption(void);
+void DuobleTap(void);
+void FreeFall(void);
 
 
 #endif

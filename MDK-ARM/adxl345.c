@@ -1,7 +1,10 @@
 #include "adxl345.h"
 
-
-
+// Настройка режима работы, по умолчанию чтение данных
+#define READ_DATA     //Получение ускорения по трем осям XYZ
+//#define AWI           //прерывание для обнаружения активности
+//#define _DOUBLE_TAP   //Настройка засекания двойного удара
+//#define _FREE_FALL    //Свободное падение
 
 
 struct Adxl_Data Adxl345;
@@ -28,11 +31,38 @@ int adxl345_init()
 	if(Adxl345.id != 0xE5)
   {return Adxl345.status = ADXL_ERR;}
 	
-	//Получение ускорения по трем осям XYZ
+#ifdef READ_DATA	//Получение ускорения по трем осям XYZ
 	SendCommand(AdxlReg.BW_RATE, BWRATE_100);
 	SendCommand(AdxlReg.POWER_CTL, POWER_CTL_Measure);
 	SendCommand(AdxlReg.DATA_FORMAT, RANGE_16G);
+#endif
+	
+#ifdef AWI        //прерывание для обнаружения активности
+	SendCommand(AdxlReg.ACT_INACT_CTL, (ACT_X | ACT_Y | ACT_Z | ACT_acdc));
+	SendCommand(AdxlReg.THRESH_ACT, 10);
+	SendCommand(AdxlReg.INT_MAP, ~(Activity));
+	SendCommand(AdxlReg.INT_ENABLE, Activity);
+	SendCommand(AdxlReg.POWER_CTL, POWER_CTL_Measure);
+#endif 
+	
+#ifdef _DOUBLE_TAP	//Настройка засекания двойного удара
+	SendCommand(AdxlReg.TAP_AXES, (TAP_X | TAP_Y | TAP_Z));
+	SendCommand(AdxlReg.THRESH_ACT, 60);
+	SendCommand(AdxlReg.DUR, 40);
+	SendCommand(AdxlReg.LATENT, 80);
+	SendCommand(AdxlReg.WINDOW, 200);
+  SendCommand(AdxlReg.INT_ENABLE, DOUBLE_TAB);
+  SendCommand(AdxlReg.INT_MAP, ~(DOUBLE_TAB));
+  SendCommand(AdxlReg.POWER_CTL, POWER_CTL_Measure);
+#endif
 
+#ifdef _FREE_FALL	//Свободное падение
+	SendCommand(AdxlReg.THRESH_FF, 3);
+	SendCommand(AdxlReg.TIME_FF, 2);
+	SendCommand(AdxlReg.INT_ENABLE, FREE_FALL);
+	SendCommand(AdxlReg.INT_MAP, ~(FREE_FALL));
+	SendCommand(AdxlReg.POWER_CTL, POWER_CTL_Measure);
+#endif 
 }
 void SendCommand(uint8_t reg,uint8_t data)
 {
@@ -55,4 +85,37 @@ void Read_Data()
 	Adxl345.xg = (SCALE_FACTOR_16G *Adxl345.x)/1000;
 	Adxl345.yg = (SCALE_FACTOR_16G *Adxl345.y)/1000;
 	Adxl345.zg = (SCALE_FACTOR_16G *Adxl345.z)/1000;
+}
+
+void ActivWichInterruption()
+{
+  HAL_I2C_Mem_Read(&hi2c1, ADXL_ADR, AdxlReg.INT_SOURCE, 1, &Adxl345.int_src, 1, 100);
+  if(Adxl345.int_src & (1 << D4))
+  {
+	  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+	  Adxl345.int_src = 0;
+  }
+  HAL_Delay(50);
+}
+
+void DuobleTap()
+{
+	HAL_I2C_Mem_Read(&hi2c1, ADXL_ADR, AdxlReg.INT_SOURCE, 1, &Adxl345.int_src, 1, 100);
+	if(Adxl345.int_src & (1 << D5))
+	{
+		HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+		Adxl345.int_src = 0;
+	}
+	HAL_Delay(50);
+}
+
+void FreeFall()
+{
+HAL_I2C_Mem_Read(&hi2c1, ADXL_ADR, AdxlReg.INT_SOURCE, 1, &Adxl345.int_src, 1, 100);
+if(Adxl345.int_src & (1 << D2))
+{
+  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+  Adxl345.int_src = 0;
+}
+HAL_Delay(50);
 }

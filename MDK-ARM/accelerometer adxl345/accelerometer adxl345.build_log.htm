@@ -22,12 +22,23 @@ Dialog DLL:      TCM.DLL V1.53.0.0
  
 <h2>Project:</h2>
 C:\Users\ornstein\Desktop\STM32 PRODJECT\accelerometer adxl345\MDK-ARM\accelerometer_adxl345.uvprojx
-Project File Date:  01/23/2022
+Project File Date:  01/25/2022
 
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 7 (build 960)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
-Build target 'accelerometer adxl345'
-"accelerometer adxl345\accelerometer adxl345.axf" - 0 Error(s), 0 Warning(s).
+Build target 'accelerometer_adxl345'
+compiling adxl345.c...
+adxl345.h(119): warning:  #1-D: last line of file ends without a newline
+  #endif
+adxl345.c(66): warning:  #940-D: missing return statement at end of non-void function "adxl345_init" 
+  }
+adxl345.c(121): warning:  #1-D: last line of file ends without a newline
+  }
+adxl345.c: 3 warnings, 0 errors
+linking...
+Program Size: Code=6388 RO-data=292 RW-data=52 ZI-data=1748  
+FromELF: creating hex file...
+"accelerometer adxl345\accelerometer adxl345.axf" - 0 Error(s), 3 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -51,7 +62,7 @@ Package Vendor: Keil
 
    * Component: ARM::CMSIS:CORE:5.5.0
       Include file:  CMSIS\Core\Include\tz_context.h
-Build Time Elapsed:  00:00:00
+Build Time Elapsed:  00:00:01
 </pre>
 </body>
 </html>
